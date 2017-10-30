@@ -11,10 +11,13 @@ getReportName() {
 
 target=$1
 
-echo $target
+echo "Scanning site : " $target
 reportName=$(getReportName)
-echo $reportName
 
 docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-baseline.py \
     -t $target -g gen.conf -J $reportName
+
+echo "Saving report : " $reportName
+
+cat $reportName | python -m json.tool > "pretty."$reportName
 
