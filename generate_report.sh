@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 
-getTimeStamp() {
-  date +%s
-}
+docker pull owasp/zap2docker-stable
 
 getReportName() {
-  timestamp=$(getTimeStamp)
-  echo $timestamp".json"
+  timestamp=$(date +%s)
+  echo $timestamp".html"
 }
-
-target=$1
-
-echo "Scanning site : " $target
 reportName=$(getReportName)
+reportSaveLocation="reports/"$reportName
+
+target=$1 # ./generate_report.sh <URL>
+echo "Scanning site : "$target
 
 docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-weekly zap-baseline.py \
-    -t $target -g gen.conf -J $reportName
+    -t $target -g gen.conf -r $reportSaveLocation
 
-echo "Saving report : " $reportName
-
-cat $reportName | python -m json.tool > "pretty."$reportName
+echo "Saving report :" $reportSaveLocation
 
